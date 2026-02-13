@@ -11,6 +11,10 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <docker.group>morarrazvan</docker.group>
+        <docker.name>quarkus-ai-test</docker.name>
+        <docker.tag>1.0.0</docker.tag>
+        <docker.registry>quay.io</docker.registry>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -42,6 +46,10 @@
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-container-image-jib</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
             <artifactId>quarkus-junit5</artifactId>
             <scope>test</scope>
         </dependency>
@@ -67,6 +75,15 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <container-image>
+                        <builder>jib</builder>
+                        <group>${docker.group}</group>
+                        <name>${docker.name}</name>
+                        <tag>${docker.tag}</tag>
+                        <registry>${docker.registry}</registry>
+                    </container-image>
+                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -77,4 +94,30 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>oci-build</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.quarkus</groupId>
+                        <artifactId>quarkus-maven-plugin</artifactId>
+                        <version>${quarkus.platform.version}</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                                <configuration>
+                                    <container-image>
+                                        <build>true</build>
+                                    </container-image>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
